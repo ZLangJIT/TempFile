@@ -10,29 +10,11 @@
 #include <fcntl.h>
 #else
 #include <unistd.h>
+#include <string.h> // strdup
+#include <stdlib.h> // free
 #endif /* defined(_WIN32) */
 
 #include <string>
-
-#if defined(_WIN32)
-
-#include <random> // std::uniform_int_distribution
-
-/* These are the characters used in temporary filenames.  */
-static const char letters[] =
-"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-#define NUM_LETTERS (62)
-
-static inline int LETTER_ID() {
-    static std::uniform_int_distribution<int> dist{ 0, NUM_LETTERS - 1 };
-    return dist(rng());
-}
-
-#define LETTER_DIST letters[LETTER_ID()]
-#else
-#include <string.h> // strdup
-#include <stdlib.h> // free
-#endif
 
 struct SaveError {
     bool reset_errno = true;
@@ -337,6 +319,22 @@ static inline std::mt19937_64& rng() {
     static std::mt19937_64 rng_ {seq_list.get(1, seed)};
     return rng_;
 }
+
+#if defined(_WIN32)
+
+/* These are the characters used in temporary filenames.  */
+static const char letters[] =
+"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+#define NUM_LETTERS (62)
+
+static inline int LETTER_ID() {
+    static std::uniform_int_distribution<int> dist{ 0, NUM_LETTERS - 1 };
+    return dist(rng());
+}
+
+#define LETTER_DIST letters[LETTER_ID()]
+
+#endif
 
 TempFile::TempFile() {
     data = std::make_shared<CleanUp>();
