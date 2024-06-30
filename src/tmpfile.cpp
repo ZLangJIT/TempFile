@@ -15,6 +15,9 @@
 #include <string>
 
 #if defined(_WIN32)
+
+#include <random> // std::uniform_int_distribution
+
 /* These are the characters used in temporary filenames.  */
 static const char letters[] =
 "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
