@@ -748,7 +748,7 @@ bool TempFileFD::construct(const std::string & dir, const std::string & template
             }
             // we got a valid handle, and we have a valid path
             this->data->path = std::move(path);
-            this->data->fd = _open_osfhandle(static_cast<intptr_t>(handle), _O_APPEND);
+            this->data->fd = _open_osfhandle(reinterpret_cast<intptr_t>(handle), _O_APPEND);
             if (this->data->fd == -1) {
                 error = {};
 
@@ -1082,7 +1082,7 @@ bool TempFileFILE::construct(const std::string & dir, const std::string & templa
             }
             // we got a valid handle, and we have a valid path
             this->data->path = std::move(path);
-            int fd = _open_osfhandle(static_cast<intptr_t>(handle), _O_APPEND);
+            int fd = _open_osfhandle(reinterpret_cast<intptr_t>(handle), _O_APPEND);
             if (fd == -1) {
                 error = {};
 
@@ -1185,7 +1185,7 @@ TempFileFD TempFile::toFD() {
     if (!is_valid()) return fd;
     fd.data->path = this->data->path;
 #if defined(_WIN32)
-    fd.data->fd = _open_osfhandle(static_cast<intptr_t>(this->data->fd), _O_APPEND);
+    fd.data->fd = _open_osfhandle(reinterpret_cast<intptr_t>(this->data->fd), _O_APPEND);
     if (fd.data->fd == -1) {
         // dont attempt to delete path, it did not exist at time of call and an error has prevented its creation
         fd.data->fatal_path = true;
@@ -1207,7 +1207,7 @@ TempFileFILE TempFile::toFILE(int open_mode) {
     if (!is_valid()) return fd;
     fd.data->path = this->data->path;
 #if defined(_WIN32)
-    int fd_ = _open_osfhandle(static_cast<intptr_t>(this->data->fd), _O_APPEND);
+    int fd_ = _open_osfhandle(reinterpret_cast<intptr_t>(this->data->fd), _O_APPEND);
     if (fd_ == -1) {
         // dont attempt to delete path, it did not exist at time of call and an error has prevented its creation
         fd.data->fatal_path = true;
@@ -1236,7 +1236,7 @@ TempFile TempFileFD::toHandle() {
     if (!is_valid()) return fd;
     fd.data->path = this->data->path;
 #if defined(_WIN32)
-    fd.data->fd = static_cast<HANDLE>(_get_osfhandle(this->data->fd));
+    fd.data->fd = reinterpret_cast<HANDLE>(_get_osfhandle(this->data->fd));
     if (fd.data->fd == INVALID_HANDLE_VALUE) {
         // dont attempt to delete path, it did not exist at time of call and an error has prevented its creation
         fd.data->fatal_path = true;
@@ -1301,7 +1301,7 @@ TempFile TempFileFILE::toHandle() {
         reset();
         return fd;
     }
-    fd.data->fd = static_cast<HANDLE>(_get_osfhandle(fd_));
+    fd.data->fd = reinterpret_cast<HANDLE>(_get_osfhandle(fd_));
     if (fd.data->fd == INVALID_HANDLE_VALUE) {
         // dont attempt to delete path, it did not exist at time of call and an error has prevented its creation
         fd.data->fatal_path = true;
